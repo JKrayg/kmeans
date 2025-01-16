@@ -1,26 +1,30 @@
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
+from sklearn.datasets import load_iris
 import numpy as np
 import math
 import random
 
-k = 4
-numPoints = 200
+k = 3
+numPoints = 100
 data = []
 centroids = []
 points = []
 dimensions = 2
 dataCount = 1
 
-# create random test data
-while dataCount <= numPoints:
-    rand = []
-    for i in range(dimensions):
-        rand.append(np.random.randint(1, numPoints))
+iris = load_iris()
+data = np.array(iris["data"])
 
-    if not any(np.array_equal(rand, c) for c in data):
-        data.append(rand)
-        dataCount += 1
+# create random test data
+# while dataCount <= numPoints:
+#     rand = []
+#     for i in range(dimensions):
+#         rand.append(np.random.randint(1, numPoints))
+
+#     if not any(np.array_equal(rand, c) for c in data):
+#         data.append(rand)
+#         dataCount += 1
 
 
 # tight cluster data (3D)
@@ -70,64 +74,46 @@ def euc(centroid, point):
     return math.sqrt(dis)
 
 
+
 def initCentroids(k, d):
-    for i in range(k):
-        if i == 0:
-            # get first centroid
-            centroids.append(d[random.randint(0, len(d) - 1)])
-        else:
-            # get more centroids
-            dists = []
-            distPercs = []
-            cumPerc = 0
-            for z in d:
-                curr = []
-                if not any(np.array_equal(z, c) for c in centroids):
-                    for v in centroids:
-                        curr.append((z, euc(v, z)))
-                    dists.append(min(curr, key = lambda x: x[1]))
-            
-            dists = sorted(dists, key = lambda x: x[1])
-            
+    centroids.append(d[random.randint(0, len(d) - 1)])
 
-            for j in dists:
-                cumPerc = cumPerc + j[1]
-                distPercs.append((j[0], (j[1], (j[1] / cumPerc))))
+    for i in range(1, k):
+        dists = np.array([min(euc(point, centroid)**2 for centroid in centroids) for point in d])
+        probs = dists / dists.sum()
+        cumulProbs = np.cumsum(probs)
 
-            distPercs = sorted(distPercs, key = lambda x: x[1][1])
-
-            randPerc = random.uniform(min(distPercs, key = lambda x: x[1][1])[1][1], 1)
-
-            for l in range(len(distPercs) - 1):
-                if distPercs[l][1][1] < randPerc and distPercs[l + 1][1][1] > randPerc:
-                    centroids.append(distPercs[0][0])
-    
+        rand = random.random()
+        for id, c in enumerate(cumulProbs):
+            if rand < c:
+                centroids.append(d[id])
+                break
     return centroids
 
 
 def assignPoints(d, c):
     pnts = []
     for i in d:
-        counter1 = 0
         temp = []
         for j in c:
             d = euc(j, i)
-            temp.append(((j, i), (counter1, d if d != 0.0 else 1.0)))
-            counter1 += 1
-        pnts.append((min(temp, key = lambda x: x[1][1])[0] , min(temp, key = lambda x: x[1][1])[1][0]))
+            temp.append(((j, i), d if d != 0.0 else 1.0))
+        
+        m = min(list(enumerate(temp)), key = lambda x: x[1][1])
+        pnts.append((m[1][0] , m[0]))
     return pnts
 
 
-def getClusters(c, p):
-    all = []
+def groupClusters(c, p):
+    clst = []
     for center in c:
         grp = []
         for pnt in p:
             if tuple(pnt[0][1]) not in [tuple(ctr) for ctr in c]:
                 if tuple(center) == tuple(pnt[0][0]):
                     grp.append(pnt[0][1])
-        all.append((center, grp))
-    return all
+        clst.append((center, grp))
+    return clst
 
 
 def updateCentroid(c):
@@ -145,13 +131,13 @@ def updateCentroid(c):
 def change(p, c):
     for p, c in zip(p, c):
         for i in range(dimensions):
-            if abs(p[i] - c[i]) < 10**-4:
+            if abs(p[i] - c[i]) < 10**-3:
                 return False
     return True
 
 
 
-print("Starting centroids", initCentroids(k, data))
+print("Starting centroids", initCentroids(k, data), "\n\n")
 points = assignPoints(data, centroids)
 count = 0
 ce = []
@@ -159,27 +145,16 @@ ce = []
 while change(ce, centroids):
     count += 1
     ce = centroids
-    centroids = updateCentroid(getClusters(centroids, points))
+    centroids = updateCentroid(groupClusters(centroids, points))
     points = assignPoints(data, centroids)
 
     colors = []
     for b in points:
         colors.append(b[1])
-
-    # 2D
-    if dimensions == 2:
-        plt.scatter(data[:, 0], data[:, 1], c=colors, alpha = 0.5, edgecolors='black', s = 100)
-        for p in centroids:
-            plt.scatter(p[0], p[1], c='red', marker='x')
-
-        plt.xlabel('Feature1')
-        plt.ylabel('Feature2')
-        plt.title('update' + str(count))
-
-        plt.show()
+    
 
     # 3D
-    elif dimensions == 3:
+    if dimensions == 3:
         plt.scatter(data[:, 0], data[:, 1], data[:, 2], c=colors, alpha = 0.5, edgecolors='black')
         for p in centroids:
             plt.scatter(p[0], p[1], p[2], c='red', marker='x')
@@ -187,6 +162,16 @@ while change(ce, centroids):
         plt.xlabel('Feature1')
         plt.ylabel('Feature2')
         plt.title(str(count) + 'update')
+
+        plt.show()
+    else:
+        plt.scatter(data[:, 0], data[:, 1], c=colors, alpha = 0.5, edgecolors='black', s = 100)
+        for p in centroids:
+            plt.scatter(p[0], p[1], c='red', marker='x')
+
+        plt.xlabel('Feature1')
+        plt.ylabel('Feature2')
+        plt.title('update' + str(count))
 
         plt.show()
 

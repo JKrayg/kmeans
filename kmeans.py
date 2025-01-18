@@ -1,12 +1,11 @@
 import matplotlib.pyplot as plt
-import plotly.graph_objects as go
 from sklearn.datasets import load_iris
 import numpy as np
 import math
 import random
 
 k = 3
-numPoints = 1200
+numPoints = 150
 data = []
 centroids = []
 points = []
@@ -17,14 +16,14 @@ dataCount = 1
 # data = np.array(iris["data"])
 
 # create random test data
-# while dataCount <= numPoints:
-#     rand = []
-#     for i in range(dimensions):
-#         rand.append(np.random.randint(1, numPoints))
+for _ in range(numPoints):
+    rand = []
+    for i in range(dimensions):
+        rand.append(np.random.randint(1, numPoints))
 
-#     if not any(np.array_equal(rand, c) for c in data):
-#         data.append(rand)
-#         dataCount += 1
+    if not any(np.array_equal(rand, c) for c in data):
+        data.append(rand)
+        dataCount += 1
 
 
 # tight cluster data (3D, k = 3)
@@ -47,22 +46,22 @@ dataCount = 1
 
 # tight cluster data (2D, k = 3)
 # **** multiple centroids get stuck on a single cluster sometimes
-data = [[5.29, 6.25], [5.18, 5.14], [5.80, 3.55],
-        [5.17, 5.38], [5.64, 5.16], [4.49, 5.58],
-        [5.35, 4.41], [4.81, 4.21], [6.40, 6.25],
-        [5.53, 4.83], [6.24, 5.59], [4.08, 5.71],
-        [4.44, 5.47], [6.14, 4.07], [3.53, 4.95],
-        [5.07, 5.67], [24.64, 25.74], [25.55, 25.14],
-        [23.46, 23.91], [26.08, 24.20], [24.82, 23.97],
-        [24.54, 25.88], [26.53, 24.98], [24.67, 24.22],
-        [25.73, 25.71], [27.48, 23.99], [23.15, 25.30],
-        [23.35, 26.11], [25.61, 24.97], [26.25, 24.94],
-        [25.65, 25.12], [24.53, 23.88], [5.02, 25.43],
-        [5.89, 25.58], [4.19, 24.31], [4.63, 27.80],
-        [6.16, 24.90], [4.39, 24.36], [5.56, 24.71],
-        [4.37, 24.73], [5.47, 25.65], [4.68, 26.07],
-        [6.23, 25.94], [4.20, 26.03], [4.70, 24.44],
-        [4.57, 25.75], [4.16, 24.57], [4.29, 24.17]]
+# data = [[5.29, 6.25], [5.18, 5.14], [5.80, 3.55],
+#         [5.17, 5.38], [5.64, 5.16], [4.49, 5.58],
+#         [5.35, 4.41], [4.81, 4.21], [6.40, 6.25],
+#         [5.53, 4.83], [6.24, 5.59], [4.08, 5.71],
+#         [4.44, 5.47], [6.14, 4.07], [3.53, 4.95],
+#         [5.07, 5.67], [24.64, 25.74], [25.55, 25.14],
+#         [23.46, 23.91], [26.08, 24.20], [24.82, 23.97],
+#         [24.54, 25.88], [26.53, 24.98], [24.67, 24.22],
+#         [25.73, 25.71], [27.48, 23.99], [23.15, 25.30],
+#         [23.35, 26.11], [25.61, 24.97], [26.25, 24.94],
+#         [25.65, 25.12], [24.53, 23.88], [5.02, 25.43],
+#         [5.89, 25.58], [4.19, 24.31], [4.63, 27.80],
+#         [6.16, 24.90], [4.39, 24.36], [5.56, 24.71],
+#         [4.37, 24.73], [5.47, 25.65], [4.68, 26.07],
+#         [6.23, 25.94], [4.20, 26.03], [4.70, 24.44],
+#         [4.57, 25.75], [4.16, 24.57], [4.29, 24.17]]
 
 
 def scale(d):
@@ -160,52 +159,6 @@ def plot():
         plt.ylabel('Feature2')
         plt.title('update ' + str(count))
 
-        fig = go.Figure()
-
-        # Add data points to the scatter plot
-        fig.add_trace(go.Scatter3d(
-            x=data[:, 0],
-            y=data[:, 1],
-            z=data[:, 2],
-            mode='markers',
-            marker=dict(
-                size=8,
-                color=colors,  # Use colors array to color the points
-                opacity=0.5,
-                line=dict(color='black', width=0.5)
-            ),
-            name='Data points'
-        ))
-
-        # Add centroids to the scatter plot
-        fig.add_trace(go.Scatter3d(
-            x=[c[0] for c in centroids],
-            y=[c[1] for c in centroids],
-            z=[c[2] for c in centroids],
-            mode='markers',
-            marker=dict(
-                size=12,
-                color='red',
-                symbol='x'
-            ),
-            name='Centroids'
-        ))
-
-        # Update layout to add axis labels and title
-        fig.update_layout(
-            scene=dict(
-                xaxis_title='Feature1',
-                yaxis_title='Feature2',
-                zaxis_title='Feature3'
-            ),
-            title='3D Scatter Plot with Centroids',
-            showlegend=True
-        )
-
-        # Show the plots
-        fig.show()
-        plt.show()
-
     else:
         plt.scatter(data[:, 0], data[:, 1], c=colors, alpha = 0.5, edgecolors='black')
         for p in centroids:
@@ -214,13 +167,13 @@ def plot():
         plt.xlabel('Feature1')
         plt.ylabel('Feature2')
         plt.title('update ' + str(count))
-
-        plt.show()
-
-
+    
+    plt.show()
 
 
-print("Starting centroids", initCentroids(k, data), "\n\n")
+
+
+initCentroids(k, data)
 points = assignPoints(data, centroids)
 count = 0
 ce = np.add(centroids, 1)
@@ -231,10 +184,6 @@ while change(ce, centroids):
     ce = centroids
     centroids = updateCentroid(groupClusters(centroids, points))
     points = assignPoints(data, centroids)
-
-    # plot()
     
 
 plot()
-
-print("Ending centroids", centroids)

@@ -1,3 +1,6 @@
+# Jake Krayger
+# Kmeans++ clustering
+
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_iris
 import numpy as np
@@ -5,7 +8,7 @@ import math
 import random
 
 k = 3
-numPoints = 150
+numPoints = 60
 data = []
 centroids = []
 points = []
@@ -16,14 +19,14 @@ dataCount = 1
 # data = np.array(iris["data"])
 
 # create random test data
-for _ in range(numPoints):
-    rand = []
-    for i in range(dimensions):
-        rand.append(np.random.randint(1, numPoints))
+# for _ in range(numPoints):
+#     rand = []
+#     for i in range(dimensions):
+#         rand.append(np.random.randint(1, numPoints))
 
-    if not any(np.array_equal(rand, c) for c in data):
-        data.append(rand)
-        dataCount += 1
+#     if not any(np.array_equal(rand, c) for c in data):
+#         data.append(rand)
+#         dataCount += 1
 
 
 # tight cluster data (3D, k = 3)
@@ -46,22 +49,22 @@ for _ in range(numPoints):
 
 # tight cluster data (2D, k = 3)
 # **** multiple centroids get stuck on a single cluster sometimes
-# data = [[5.29, 6.25], [5.18, 5.14], [5.80, 3.55],
-#         [5.17, 5.38], [5.64, 5.16], [4.49, 5.58],
-#         [5.35, 4.41], [4.81, 4.21], [6.40, 6.25],
-#         [5.53, 4.83], [6.24, 5.59], [4.08, 5.71],
-#         [4.44, 5.47], [6.14, 4.07], [3.53, 4.95],
-#         [5.07, 5.67], [24.64, 25.74], [25.55, 25.14],
-#         [23.46, 23.91], [26.08, 24.20], [24.82, 23.97],
-#         [24.54, 25.88], [26.53, 24.98], [24.67, 24.22],
-#         [25.73, 25.71], [27.48, 23.99], [23.15, 25.30],
-#         [23.35, 26.11], [25.61, 24.97], [26.25, 24.94],
-#         [25.65, 25.12], [24.53, 23.88], [5.02, 25.43],
-#         [5.89, 25.58], [4.19, 24.31], [4.63, 27.80],
-#         [6.16, 24.90], [4.39, 24.36], [5.56, 24.71],
-#         [4.37, 24.73], [5.47, 25.65], [4.68, 26.07],
-#         [6.23, 25.94], [4.20, 26.03], [4.70, 24.44],
-#         [4.57, 25.75], [4.16, 24.57], [4.29, 24.17]]
+data = [[5.29, 6.25], [5.18, 5.14], [5.80, 3.55],
+        [5.17, 5.38], [5.64, 5.16], [4.49, 5.58],
+        [5.35, 4.41], [4.81, 4.21], [6.40, 6.25],
+        [5.53, 4.83], [6.24, 5.59], [4.08, 5.71],
+        [4.44, 5.47], [6.14, 4.07], [3.53, 4.95],
+        [5.07, 5.67], [24.64, 25.74], [25.55, 25.14],
+        [23.46, 23.91], [26.08, 24.20], [24.82, 23.97],
+        [24.54, 25.88], [26.53, 24.98], [24.67, 24.22],
+        [25.73, 25.71], [27.48, 23.99], [23.15, 25.30],
+        [23.35, 26.11], [25.61, 24.97], [26.25, 24.94],
+        [25.65, 25.12], [24.53, 23.88], [5.02, 25.43],
+        [5.89, 25.58], [4.19, 24.31], [4.63, 27.80],
+        [6.16, 24.90], [4.39, 24.36], [5.56, 24.71],
+        [4.37, 24.73], [5.47, 25.65], [4.68, 26.07],
+        [6.23, 25.94], [4.20, 26.03], [4.70, 24.44],
+        [4.57, 25.75], [4.16, 24.57], [4.29, 24.17]]
 
 
 def scale(d):
@@ -184,6 +187,5 @@ while change(ce, centroids):
     ce = centroids
     centroids = updateCentroid(groupClusters(centroids, points))
     points = assignPoints(data, centroids)
-    
 
 plot()
